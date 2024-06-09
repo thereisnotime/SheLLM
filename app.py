@@ -46,6 +46,7 @@ class TerminalWrapper:
         self.context = ""
         self.history = []
         self.model = OpenAIModel()
+        self.ssh_session = None
 
     def execute_system_command(self, command):
         """Executes system commands and captures output."""
@@ -82,18 +83,38 @@ class TerminalWrapper:
     def run_interactive_ssh(self, tokens):
         """Runs an interactive SSH session."""
         try:
-            process = subprocess.Popen(tokens, shell=False)
-            process.communicate()
+            self.ssh_session = subprocess.Popen(tokens, shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            self.interactive_ssh()
         except Exception as e:
             print(f"SSH session error: {e}", file=sys.stderr)
 
-    def handle_lm_command(self, command):
+    def interactive_ssh(self):
+        """Handles interactive SSH session."""
+        while self.ssh_session and self.ssh_session.poll() is None:
+            command = input(get_prompt())
+            if command.strip().startswith('##'):
+                self.answer_question(command[2:].strip())
+            elif command.strip().startswith('#'):
+                self.handle_lm_command(command[1:].strip(), remote=True)
+            else:
+                self.ssh_session.stdin.write(command + '\n')
+                self.ssh_session.stdin.flush()
+                output = self.ssh_session.stdout.read()
+                print(output)
+
+    def handle_lm_command(self, command, remote=False):
         suggestion = self.model.get_command_suggestion(self.context, command)
         if suggestion:
             current_time = datetime.now().strftime('%H:%M:%S')
             print(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Execute command: {Fore.RED}{suggestion}{Style.RESET_ALL}")
             if click.confirm(''):
-                self.execute_system_command(suggestion)
+                if remote:
+                    self.ssh_session.stdin.write(suggestion + '\n')
+                    self.ssh_session.stdin.flush()
+                    output = self.ssh_session.stdout.read()
+                    print(output)
+                else:
+                    self.execute_system_command(suggestion)
 
     def answer_question(self, question):
         answer = self.model.answer_question(self.context, question)
