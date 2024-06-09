@@ -1,41 +1,44 @@
 import subprocess
-import os
-from openai import OpenAI
-from dotenv import load_dotenv
+import click
 
-load_dotenv()
+class TerminalWrapper:
+    def __init__(self):
+        self.context = ""
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    def execute_system_command(self, command):
+        """Execute system commands and capture output."""
+        try:
+            result = subprocess.run(command, shell=True, text=True, capture_output=True, check=True)
+            output = result.stdout
+            error = result.stderr
+            self.context += f"\n$ {command}\n{output}{error}"
+            print(output)
+            if error:
+                print(f"Error: {error}", file=sys.stderr)
+        except subprocess.CalledProcessError as e:
+            print(f"An error occurred: {e}", file=sys.stderr)
 
-def run_command(command):
-    """Executes a given command and returns the output."""
-    try:
-        output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT, text=True)
-        return output
-    except subprocess.CalledProcessError as e:
-        return e.output
+    def handle_lm_command(self, command):
+        """Handle commands intended for the LM (placeholder for actual LM integration)."""
+        print(f"LM Command: {command}")
+        # Placeholder: Simulate an LM response
+        simulated_response = "echo 'This is a simulated response'"
+        print(f"Suggested command by LM: {simulated_response}")
+        if click.confirm('Execute this command?'):
+            self.execute_system_job(simulated_response)
 
-def get_ai_suggestion(prompt):
-    """Uses the OpenAI API to get command suggestions based on the user's input."""
-    try:
-        response = client.completions.create(engine="text-davinci-002",  # Check the latest model on the OpenAI API documentation
-        prompt=prompt,
-        max_tokens=50)
-        return response.choices[0].text.strip()
-    except Exception as e:
-        return f"Error in AI response: {e}"
-
+@click.command()
 def main():
+    wrapper = TerminalWrapper()
+    click.echo("Welcome to the Terminal Wrapper. Type 'exit' to quit.")
     while True:
-        cmd_input = input("Command to run: ")
-        ai_suggested_command = get_ai_suggestion("Suggest a command for: " + cmd_input)
-        print("AI suggests:", ai_suggested_command)
-        approval = input("Execute this command? (yes/no): ")
-        if approval.lower() == "yes":
-            result = run_command(ai_suggested_command)
-            print(result)
+        cmd = input(">")
+        if cmd == "exit":
+            break
+        elif cmd.startswith('#'):
+            wrapper.handle_lm_command(cmd[1:])
         else:
-            print("Command execution cancelled.")
+            wrapper.execute_system_command(cmd)
 
 if __name__ == "__main__":
     main()
