@@ -39,6 +39,8 @@ The following are the current known issues with SheLLM:
 
 - [x] Add support for ChatGPT.
 - [ ] Add Groq support.
+- [ ] Add a proper logging mechanism.
+- [ ] Add env/config validation on load.
 - [ ] Handle proper stream disconnects.
 - [ ] Add a mechanism to detect errors after commands execution and ask to solve them.
 - [ ] Add configuration support (LLM type, LLM model config per command type, token, history size, trigger chars, execute command without confirmation).
