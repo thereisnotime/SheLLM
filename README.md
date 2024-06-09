@@ -20,6 +20,7 @@ Test following cases/scenarios:
 - [ ] Test if it handles errors.
 - [ ] Test in tmux.
 - [ ] Test in screen.
+- [ ] Test if it will work better outside of venv.
 - [ ] Test context handling.
 
 ## Known Issues
@@ -38,6 +39,7 @@ The following are the current known issues with SheLLM:
 
 - [x] Add support for ChatGPT.
 - [ ] Add Groq support.
+- [ ] Handle proper stream disconnects.
 - [ ] Add a mechanism to detect errors after commands execution and ask to solve them.
 - [ ] Add configuration support (LLM type, LLM model config per command type, token, history size, trigger chars, execute command without confirmation).
 - [ ] Add wrapper for screen (auto start and stop).
