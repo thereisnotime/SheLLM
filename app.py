@@ -11,10 +11,13 @@ import shlex
 def get_git_info():
     """Returns the current git branch and status if in a git repository."""
     try:
-        branch = subprocess.check_output(['git', 'branch', '--show-current'], text=True).strip()
-        status = subprocess.check_output(['git', 'status', '--porcelain'], text=True)
-        changes = len(status.split('\n')) - 1 if status else 0
-        return f"{branch} | {changes} changes" if branch else ""
+        # Check if the current directory is a git repository
+        if subprocess.run(['git', 'rev-parse', '--is-inside-work-tree'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True).returncode == 0:
+            branch = subprocess.check_output(['git', 'branch', '--show-current'], text=True).strip()
+            status = subprocess.check_output(['git', 'status', '--porcelain'], text=True)
+            changes = len(status.split('\n')) - 1 if status else 0
+            return f"{branch} | {changes} changes" if branch else ""
+        return ""
     except subprocess.CalledProcessError:
         return ""
 
@@ -33,12 +36,12 @@ def get_prompt():
         f"{Fore.GREEN}{path}{Style.RESET_ALL}"
     ]
     if git_info:
-        prompt_parts.append(f"{Fore.CYAN}{git_info}{Style.RESET_ALL}")
+        prompt_parts.append(f"{Fore.CYAN}({git_info}){Style.RESET_ALL}")
     if venv:
         prompt_parts.append(f"{Fore.MAGENTA}(venv:{venv}){Style.RESET_ALL}")
     return ' '.join(prompt_parts) + "\n>"
 
-class SheLLM:
+class TerminalWrapper:
     def __init__(self):
         self.context = ""
         self.history = []
@@ -98,7 +101,7 @@ class SheLLM:
 def main():
     init(autoreset=True)  # Initialize Colorama
     click.echo("Welcome to the SheLLM. Prefix with '#' to generate a command or '##' to ask a question. Type 'exit' to quit.")
-    wrapper = SheLLM()
+    wrapper = TerminalWrapper()
     while True:
         cmd = input(get_prompt())
         if cmd.lower() == "exit":
