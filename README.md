@@ -2,6 +2,8 @@
 <h3 align="center">Let the AI  in your terminal </h3>
 <hr>
 
+![GitHub License](https://img.shields.io/github/license/thereisnotime/SheLLM) ![Static Badge](https://img.shields.io/badge/https%3A%2F%2Ft.me%2F%2BIBtlo3xD-cs0NzVk?style=flat&logo=telegram&label=Telegram%20Group&link=https%3A%2F%2Ft.me%2F%2BIBtlo3xD-cs0NzVk) ![GitHub commit activity](https://img.shields.io/github/commit-activity/t/thereisnotime/SheLLM) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
+
 <h3 align="center">🤖 Powered by [INSERT LLM HERE]) 🤖</h3>
 
 <h3>NOTE: This is a PoC in very, very early stage of development (but it works). Help is most welcome!<h3>
@@ -12,16 +14,14 @@
   </a>
 </p>
 
-# SheLLM [![stability][0]][1]
+# SheLLM
 
-A PoC for a shell wrapper that integrates LLM model(s) for command suggestions and questions with context awareness.
+A PoC for a shell wrapper that integrates LLM model(s) for command suggestions and questions with context awareness (not going to take over your computer, I promise).
 It can also execute commands and provide suggestions based on the context.
-
-> It is in very, very early stage of development so expect bugs and issues.
 
 ## Table of Contents
 
-- [SheLLM \[!\[stability\]\[0\]\]\[1\]](#shellm-stability01)
+- [SheLLM](#shellm)
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
   - [Motivation](#motivation)
@@ -104,6 +104,7 @@ Feel free to contribute to the roadmap by creating issues or pull requests with 
 - [ ] Add context size warnings and automatic context cleanup.
 - [ ] Proper handling of error exits.
 - [ ] Build PyPI package.
+- [ ] Add fancy GitHub Actions CI/CD pipelines with labels and badges.
 - [ ] Improve repository structure.
 - [ ] Add env/config validation on load.
 - [ ] Add Jinja2 support for prompt customization.
@@ -122,7 +123,9 @@ Feel free to contribute to the roadmap by creating issues or pull requests with 
 
 ## Contribution
 
-Feel free to contribute to SheLLM by creating issues or pull requests.
+Feel free to contribute to SheLLM by creating issues or pull requests. If you have any questions or need help, feel free to ask in the discussions group on Telegram:
+
+![Static Badge](https://img.shields.io/badge/https%3A%2F%2Ft.me%2F%2BIBtlo3xD-cs0NzVk?style=flat&logo=telegram&label=Telegram%20Group&link=https%3A%2F%2Ft.me%2F%2BIBtlo3xD-cs0NzVk)
 
 ## License
 
