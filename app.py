@@ -6,6 +6,7 @@ import getpass
 from datetime import datetime
 from colorama import Fore, Style, init
 from models.openai_model import OpenAIModel
+import shlex
 
 def get_git_info():
     """Returns the current git branch and status if in a git repository."""
@@ -45,20 +46,33 @@ class SheLLM:
 
     def execute_system_command(self, command):
         """Executes system commands and captures output."""
-        if command == "history":
+        tokens = shlex.split(command)
+        if tokens[0] == 'cd':
+            self.change_directory(tokens)
+        elif tokens[0] == 'history':
             self.show_history()
-            return
+        else:
+            try:
+                result = subprocess.run(command, shell=True, text=True, capture_output=True, check=True)
+                output = result.stdout
+                error = result.stderr
+                self.context += f"\n$ {command}\n{output}{error}"
+                self.history.append(command)
+                print(output)
+                if error:
+                    print(f"Error: {error}", file=sys.stderr)
+            except subprocess.CalledProcessError as e:
+                print(f"An error occurred: {e}", file=sys.stderr)
+
+    def change_directory(self, tokens):
+        """Handles the 'cd' command."""
         try:
-            result = subprocess.run(command, shell=True, text=True, capture_output=True, check=True)
-            output = result.stdout
-            error = result.stderr
-            self.context += f"\n$ {command}\n{output}{error}"
-            self.history.append(command)
-            print(output)
-            if error:
-                print(f"Error: {error}", file=sys.stderr)
-        except subprocess.CalledProcessError as e:
-            print(f"An error occurred: {e}", file=sys.stderr)
+            if len(tokens) > 1:
+                os.chdir(tokens[1])
+            else:
+                os.chdir(os.path.expanduser('~'))
+        except FileNotFoundError as e:
+            print(f"cd: {e}", file=sys.stderr)
 
     def handle_lm_command(self, command):
         suggestion = self.model.get_command_suggestion(self.context, command)

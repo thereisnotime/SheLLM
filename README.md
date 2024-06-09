@@ -26,4 +26,5 @@ Test following cases:
 - [x] Remove SheLLM prompts from history (intercept).
 - [ ] Add detailed SheLLM history (with timestamps) for each session.
 - [ ] Add local logging for full terminal context for future embeddings optimization.
+- [ ] Add TAB completion for commands.
 - [ ] Proper handling of error exits.
