@@ -42,9 +42,9 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
                 }
             ]
             response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o",
                 messages=messages,
-                max_tokens=500
+                max_tokens=600
             )
             if response.choices:
                 validated_command = response.choices[0].message.content.strip()
