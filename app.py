@@ -23,10 +23,16 @@ class TerminalWrapper:
 
     def handle_lm_command(self, command):
         print(f"Handling LM command: {command}")  # Debug print
-        suggestion = self.model.get_suggestion(self.context, command)
+        suggestion = self.model.get_command_suggestion(self.context, command)
         print(f"Suggested Command: {suggestion}")  # Debug print
-        if suggestion and click.confirm(f'Execute this command? {suggestion}'):
+        if suggestion and click.confirm(f'Execute it?'):
             self.execute_system_command(suggestion)
+
+    def answer_question(self, question):
+        print(f"Answering question: {question}")  # Debug print
+        answer = self.model.answer_question(self.context, question)
+        print(f"Answer: {answer}")
+        return answer
 
 @click.command()
 def main():
@@ -36,7 +42,9 @@ def main():
         cmd = input(">")
         if cmd.lower() == "exit":
             break
-        elif cmd.strip().startswith('#'):  # Ensure stripping any leading/trailing spaces
+        elif cmd.strip().startswith('##'):  # Double hash for just getting answers
+            wrapper.answer_question(cmd[2:].strip())  # Remove the '##' and pass the question
+        elif cmd.strip().startswith('#'):  # Single hash for executing commands
             wrapper.handle_lm_command(cmd[1:].strip())  # Remove the '#' and pass the command
         else:
             wrapper.execute_system_command(cmd)
