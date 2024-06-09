@@ -36,7 +36,7 @@ def get_prompt():
         f"{Fore.GREEN}{path}{Style.RESET_ALL}"
     ]
     if git_info:
-        prompt_parts.append(f"{Fore.CYAN}({git_info}){Style.RESET_ALL}")
+        prompt_parts.append(f"{Fore.CYAN}{git_info}{Style.RESET_ALL}")
     if venv:
         prompt_parts.append(f"{Fore.MAGENTA}(venv:{venv}){Style.RESET_ALL}")
     return ' '.join(prompt_parts) + "\n>"
@@ -54,6 +54,8 @@ class TerminalWrapper:
             self.change_directory(tokens)
         elif tokens[0] == 'history':
             self.show_history()
+        elif tokens[0] == 'ssh':
+            self.run_interactive_ssh(tokens)
         else:
             try:
                 result = subprocess.run(command, shell=True, text=True, capture_output=True, check=True)
@@ -76,6 +78,14 @@ class TerminalWrapper:
                 os.chdir(os.path.expanduser('~'))
         except FileNotFoundError as e:
             print(f"cd: {e}", file=sys.stderr)
+
+    def run_interactive_ssh(self, tokens):
+        """Runs an interactive SSH session."""
+        try:
+            process = subprocess.Popen(tokens, shell=False)
+            process.communicate()
+        except Exception as e:
+            print(f"SSH session error: {e}", file=sys.stderr)
 
     def handle_lm_command(self, command):
         suggestion = self.model.get_command_suggestion(self.context, command)
