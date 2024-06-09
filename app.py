@@ -1,4 +1,6 @@
 import click
+import subprocess
+import sys
 from models.openai_model import OpenAIModel
 
 class TerminalWrapper:
@@ -6,26 +8,18 @@ class TerminalWrapper:
         self.context = ""
         self.model = OpenAIModel()
 
-    # def execute_system_command(self, command):
-    #     """Execute system commands and capture output."""
-    #     try:
-    #         result = subprocess.run(command, shell=True, text=True, capture_output=True, check=True)
-    #         output = result.stdout
-    #         error = result.stderr
-    #         self.context += f"\n$ {command}\n{output}{error}"
-    #         print(output)
-    #         if error:
-    #             print(f"Error: {error}", file=sys.stderr)
-    #     except subprocess.CalledProcessError as e:
-    #         print(f"An error occurred: {e}", file=sys.stderr)
-
     def execute_system_command(self, command):
         """Executes system commands and captures output."""
-        import subprocess
-        result = subprocess.run(command, shell=True, text=True, capture_output=True)
-        output = result.stdout + result.stderr
-        self.context += f"\n$ {command}\n{output}"
-        print(output)
+        try:
+            result = subprocess.run(command, shell=True, text=True, capture_output=True, check=True)
+            output = result.stdout
+            error = result.stderr
+            self.context += f"\n$ {command}\n{output}{error}"
+            print(output)
+            if error:
+                print(f"Error: {error}", file=sys.stderr)
+        except subprocess.CalledProcessError as e:
+            print(f"An error occurred: {e}", file=sys.stderr)
 
     def handle_lm_command(self, command):
         suggestion = self.model.get_suggestion(self.context, command)
@@ -38,10 +32,10 @@ def main():
     wrapper = TerminalWrapper()
     while True:
         cmd = input(">")
-        if cmd == "exit":
+        if cmd.lower() == "exit":
             break
         elif cmd.startswith('#'):
-            wrapper.handle_lm_command(cmd[1:])  # Remove the '#' and pass the command
+            wrapper.handle_lm_command(cmd[1:].strip())  # Remove the '#' and pass the command
         else:
             wrapper.execute_system_command(cmd)
 

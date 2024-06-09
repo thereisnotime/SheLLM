@@ -32,6 +32,7 @@ class OpenAIModel:
                 messages=messages,
                 max_tokens=4000
             )
+            print(response)
             # Extract the response text
             return response.choices[0].message['content'].strip() if 'choices' in response else None
         except Exception as e:
