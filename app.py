@@ -37,18 +37,23 @@ def get_prompt():
         prompt_parts.append(f"{Fore.MAGENTA}(venv:{venv}){Style.RESET_ALL}")
     return ' '.join(prompt_parts) + "\n>"
 
-class TerminalWrapper:
+class SheLLM:
     def __init__(self):
         self.context = ""
+        self.history = []
         self.model = OpenAIModel()
 
     def execute_system_command(self, command):
         """Executes system commands and captures output."""
+        if command == "history":
+            self.show_history()
+            return
         try:
             result = subprocess.run(command, shell=True, text=True, capture_output=True, check=True)
             output = result.stdout
             error = result.stderr
             self.context += f"\n$ {command}\n{output}{error}"
+            self.history.append(command)
             print(output)
             if error:
                 print(f"Error: {error}", file=sys.stderr)
@@ -69,11 +74,17 @@ class TerminalWrapper:
         print(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Answer: {Fore.GREEN}{answer}{Style.RESET_ALL}")
         return answer
 
+    def show_history(self):
+        current_time = datetime.now().strftime('%H:%M:%S')
+        print(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Command History:")
+        for i, cmd in enumerate(self.history, 1):
+            print(f"{i}: {cmd}")
+
 @click.command()
 def main():
     init(autoreset=True)  # Initialize Colorama
     click.echo("Welcome to the SheLLM. Prefix with '#' to generate a command or '##' to ask a question. Type 'exit' to quit.")
-    wrapper = TerminalWrapper()
+    wrapper = SheLLM()
     while True:
         cmd = input(get_prompt())
         if cmd.lower() == "exit":

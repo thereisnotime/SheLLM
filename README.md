@@ -23,5 +23,7 @@ Test following cases:
 
 - [ ] Add configuration support (LLM, token, history size, trigger chars, execute command without confirmation).
 - [ ] Add wrapper for screen (auto start and stop).
-- [ ] Remove questions from history.
+- [x] Remove SheLLM prompts from history (intercept).
+- [ ] Add detailed SheLLM history (with timestamps) for each session.
+- [ ] Add local logging for full terminal context for future embeddings optimization.
 - [ ] Proper handling of error exits.
