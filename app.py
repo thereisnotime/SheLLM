@@ -37,7 +37,7 @@ def get_prompt():
         f"{Fore.GREEN}{path}{Style.RESET_ALL}"
     ]
     if git_info:
-        prompt_parts.append(f"{Fore.CYAN}({git_info}){Style.RESET_ALL}")
+        prompt_parts.append(f"{Fore.CYAN}{git_info}{Style.RESET_ALL}")
     if venv:
         prompt_parts.append(f"{Fore.MAGENTA}(venv:{venv}){Style.RESET_ALL}")
     return ' '.join(prompt_parts) + "\n>"
