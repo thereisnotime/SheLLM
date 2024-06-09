@@ -18,6 +18,24 @@ class GroqModel:
                 },
                 {
                     "role": "user",
+                    "content": "ls -d */"
+                },
+                {
+                    "role": "assistant",
+                    "content": "ls -d */"
+                },
+                {
+                    "role": "user",
+                    "content": """```sh
+docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $3, $4;s+=($3~/GB/?$2*1024:($3~/kB/?$2/1024:$2));getline}} END{print "Total Size: " s"MB"}' | sort -k1,1rn
+```"""
+                },
+                {
+                    "role": "assistant",
+                    "content": """sudo docker volume ls -q | xargs -I {} docker volume inspect {} --format='{{ .Name }}{{ printf "\t" }}{{ .Mountpoint }}' | sudo awk '{ system("sudo du -hs " $2) }' | sort -rh"""
+                },
+                {
+                    "role": "user",
                     "content": command
                 }
             ]

@@ -6,9 +6,7 @@ class OpenAIModel:
     def __init__(self):
         load_dotenv()
         self.api_key = os.getenv('OPENAI_API_KEY')
-        # Create an instance of the OpenAI client
         self.client = openai.OpenAI(api_key=self.api_key)
-
 
     def validate_command(self, command):
         """Validates the command to ensure it is safe and valid to execute."""

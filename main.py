@@ -6,6 +6,7 @@ import getpass
 from datetime import datetime
 from colorama import Fore, Style, init
 from models.openai_model import OpenAIModel
+from models.groq_model import GroqModel
 import shlex
 import pty
 
@@ -37,16 +38,19 @@ def get_prompt():
         f"{Fore.GREEN}{path}{Style.RESET_ALL}"
     ]
     if git_info:
-        prompt_parts.append(f"{Fore.CYAN}{git_info}{Style.RESET_ALL}")
+        prompt_parts.append(f"{Fore.CYAN}({git_info}){Style.RESET_ALL}")
     if venv:
         prompt_parts.append(f"{Fore.MAGENTA}(venv:{venv}){Style.RESET_ALL}")
     return ' '.join(prompt_parts) + "\n>"
 
-class TerminalWrapper:
-    def __init__(self):
+class SheLLM:
+    def __init__(self, llm_api):
         self.context = ""
         self.history = []
-        self.model = OpenAIModel()
+        if llm_api == 'groq':
+            self.model = GroqModel()
+        else:
+            self.model = OpenAIModel()
         self.ssh_session = None
 
     def execute_system_command(self, command):
@@ -69,7 +73,7 @@ class TerminalWrapper:
                 if error:
                     print(f"Error: {error}", file=sys.stderr)
             except subprocess.CalledProcessError as e:
-                print(f"An error occurred: {e}", file=sys.stderr)
+                print(f"An error occurred: {e}", file.sys.stderr)
 
     def change_directory(self, tokens):
         """Handles the 'cd' command."""
@@ -127,6 +131,7 @@ class TerminalWrapper:
         print(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Answer: {Fore.GREEN}{answer}{Style.RESET_ALL}")
         return answer
 
+    # TODO: Hook this with the shell history and implement SheLLM custom history with session support.
     def show_history(self):
         current_time = datetime.now().strftime('%H:%M:%S')
         print(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Command History:")
@@ -134,10 +139,11 @@ class TerminalWrapper:
             print(f"{i}: {cmd}")
 
 @click.command()
-def main():
-    init(autoreset=True)  # Initialize Colorama
-    click.echo("Welcome to the SheLLM. Prefix with '#' to generate a command or '##' to ask a question. Type 'exit' to quit.")
-    wrapper = TerminalWrapper()
+@click.option('--llm-api', type=click.Choice(['openai', 'groq']), default='openai', help="Choose the language model API to use.")
+def main(llm_api):
+    init(autoreset=True)
+    click.echo(f"Welcome to the {Fore.RED}SheLLM{Style.RESET_ALL} Model: {Fore.BLUE}{llm_api.capitalize()}{Style.RESET_ALL}. Prefix with '#' to generate a command or '##' to ask a question. Type 'exit' to quit.")
+    wrapper = SheLLM(llm_api=llm_api)
     while True:
         cmd = input(get_prompt())
         if cmd.lower() == "exit":
