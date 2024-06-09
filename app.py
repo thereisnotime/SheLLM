@@ -3,8 +3,8 @@ import subprocess
 import sys
 import os
 import getpass
+from datetime import datetime
 from colorama import Fore, Style, init
-
 from models.openai_model import OpenAIModel
 
 def get_git_info():
@@ -23,9 +23,11 @@ def get_prompt():
     host = os.uname().nodename
     path = os.getcwd()
     git_info = get_git_info()
-    venv = os.environ.get('VIRTUAL_ENV', '').split('/')[-1]
+    venv = os.environ.get('VIRTUAL_ENV', '').split('/')[-1] if os.environ.get('VIRTUAL_ENV') else ""
+    current_time = datetime.now().strftime('%H:%M:%S')
     prompt_parts = [
         f"{Fore.RED}[SheLLM]{Style.RESET_ALL}",
+        f"{Fore.BLUE}[{current_time}]{Style.RESET_ALL}",
         f"{Fore.GREEN}{user}{Style.RESET_ALL}@{host}:",
         f"{Fore.GREEN}{path}{Style.RESET_ALL}"
     ]
@@ -56,19 +58,21 @@ class TerminalWrapper:
     def handle_lm_command(self, command):
         suggestion = self.model.get_command_suggestion(self.context, command)
         if suggestion:
-            print(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} Execute command: {Fore.RED}{suggestion}{Style.RESET_ALL}")
+            current_time = datetime.now().strftime('%H:%M:%S')
+            print(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Execute command: {Fore.RED}{suggestion}{Style.RESET_ALL}")
             if click.confirm(''):
                 self.execute_system_command(suggestion)
 
     def answer_question(self, question):
         answer = self.model.answer_question(self.context, question)
-        print(f"Answer: {answer}")
+        current_time = datetime.now().strftime('%H:%M:%S')
+        print(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Answer: {Fore.GREEN}{answer}{Style.RESET_ALL}")
         return answer
 
 @click.command()
 def main():
     init(autoreset=True)  # Initialize Colorama
-    click.echo("Welcome to the SheLLM. Prefix with '#' to generate a comand or '##' to ask a question. Type 'exit' to quit.")
+    click.echo("Welcome to the SheLLM. Prefix with '#' to generate a command or '##' to ask a question. Type 'exit' to quit.")
     wrapper = TerminalWrapper()
     while True:
         cmd = input(get_prompt())
