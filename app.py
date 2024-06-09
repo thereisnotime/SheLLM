@@ -7,6 +7,7 @@ from datetime import datetime
 from colorama import Fore, Style, init
 from models.openai_model import OpenAIModel
 import shlex
+import pty
 
 def get_git_info():
     """Returns the current git branch and status if in a git repository."""
@@ -36,7 +37,7 @@ def get_prompt():
         f"{Fore.GREEN}{path}{Style.RESET_ALL}"
     ]
     if git_info:
-        prompt_parts.append(f"{Fore.CYAN}{git_info}{Style.RESET_ALL}")
+        prompt_parts.append(f"{Fore.CYAN}({git_info}){Style.RESET_ALL}")
     if venv:
         prompt_parts.append(f"{Fore.MAGENTA}(venv:{venv}){Style.RESET_ALL}")
     return ' '.join(prompt_parts) + "\n>"
@@ -83,24 +84,31 @@ class TerminalWrapper:
     def run_interactive_ssh(self, tokens):
         """Runs an interactive SSH session."""
         try:
-            self.ssh_session = subprocess.Popen(tokens, shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            self.interactive_ssh()
+            pid, fd = pty.fork()
+            if pid == 0:
+                os.execvp(tokens[0], tokens)
+            else:
+                self.ssh_session = fd
+                self.interactive_ssh()
         except Exception as e:
             print(f"SSH session error: {e}", file=sys.stderr)
 
     def interactive_ssh(self):
         """Handles interactive SSH session."""
-        while self.ssh_session and self.ssh_session.poll() is None:
-            command = input(get_prompt())
-            if command.strip().startswith('##'):
-                self.answer_question(command[2:].strip())
-            elif command.strip().startswith('#'):
-                self.handle_lm_command(command[1:].strip(), remote=True)
-            else:
-                self.ssh_session.stdin.write(command + '\n')
-                self.ssh_session.stdin.flush()
-                output = self.ssh_session.stdout.read()
-                print(output)
+        while self.ssh_session:
+            try:
+                data = os.read(self.ssh_session, 1024).decode()
+                if data:
+                    print(data, end='', flush=True)
+                command = input(get_prompt())
+                if command.strip().startswith('##'):
+                    self.answer_question(command[2:].strip())
+                elif command.strip().startswith('#'):
+                    self.handle_lm_command(command[1:].strip(), remote=True)
+                else:
+                    os.write(self.ssh_session, (command + '\n').encode())
+            except OSError:
+                break
 
     def handle_lm_command(self, command, remote=False):
         suggestion = self.model.get_command_suggestion(self.context, command)
@@ -108,11 +116,8 @@ class TerminalWrapper:
             current_time = datetime.now().strftime('%H:%M:%S')
             print(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Execute command: {Fore.RED}{suggestion}{Style.RESET_ALL}")
             if click.confirm(''):
-                if remote:
-                    self.ssh_session.stdin.write(suggestion + '\n')
-                    self.ssh_session.stdin.flush()
-                    output = self.ssh_session.stdout.read()
-                    print(output)
+                if remote and self.ssh_session:
+                    os.write(self.ssh_session, (suggestion + '\n').encode())
                 else:
                     self.execute_system_command(suggestion)
 

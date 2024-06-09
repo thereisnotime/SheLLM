@@ -24,6 +24,10 @@ Test following cases/scenarios:
 
 ## Known Issues
 
+The following are the current known issues with SheLLM:
+
+- [ ] SheLLM does not like an empty command.
+- [ ] SheLLM does not handle SSH stream properly (could be better).
 - [ ] SheLLM does not handle error exits properly.
 - [ ] SheLLM does not handle streaming output properly.
 - [ ] SheLLM does not handle TAB completion for commands.
