@@ -27,6 +27,7 @@ Test following cases/scenarios:
 - [ ] SheLLM does not handle error exits properly.
 - [ ] SheLLM does not handle streaming output properly.
 - [ ] SheLLM does not handle TAB completion for commands.
+- [ ] SheLLM does not handle ALT/CTRL cursor movement shortcuts.
 - [ ] SheLLM's context should take the last output with higher priority and not the previous commands.
 
 ## Roadmap
