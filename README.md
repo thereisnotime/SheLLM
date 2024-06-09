@@ -33,8 +33,10 @@ Test following cases/scenarios:
 
 - [x] Add support for ChatGPT.
 - [ ] Add Groq support.
+- [ ] Add a mechanism to detect errors after commands execution and ask to solve them.
 - [ ] Add configuration support (LLM type, LLM model config per command type, token, history size, trigger chars, execute command without confirmation).
 - [ ] Add wrapper for screen (auto start and stop).
+- [ ] Add `fzf` support with suggestion mode for commands + shortcut to return to previous choice.
 - [x] Remove SheLLM prompts from history (intercept).
 - [ ] Add detailed SheLLM history (with timestamps) for each session.
 - [ ] Add local logging for full terminal context for future embeddings optimization.
