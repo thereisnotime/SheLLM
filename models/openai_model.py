@@ -12,15 +12,28 @@ class OpenAIModel:
 
     def get_suggestion(self, context, prompt):
         try:
-            full_prompt = f"Given the terminal history:\n{context}\nUser asks: {prompt}\nSuggest a command:"
-            # Correct method call using the client instance
-            response = self.client.completions.create(
+            messages = [
+                {
+                    "role": "system",
+                    "content": "You are a helpful assistant that must only output shell commands and nothing else."
+                },
+                {
+                    "role": "user",
+                    "content": context
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+            # Use the chat completions endpoint with proper formatting
+            response = self.client.chat.completions.create(
                 model="gpt-4o",
-                prompt=full_prompt,
-                max_tokens=150
+                messages=messages,
+                max_tokens=4000
             )
-            # Properly access the choices and text
-            return response['choices'][0]['text'].strip() if 'choices' in response else None
+            # Extract the response text
+            return response.choices[0].message['content'].strip() if 'choices' in response else None
         except Exception as e:
             print(f"Error fetching suggestion from OpenAI: {e}")
             return None
