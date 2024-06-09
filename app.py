@@ -22,7 +22,9 @@ class TerminalWrapper:
             print(f"An error occurred: {e}", file=sys.stderr)
 
     def handle_lm_command(self, command):
+        print(f"Handling LM command: {command}")  # Debug print
         suggestion = self.model.get_suggestion(self.context, command)
+        print(f"Suggested Command: {suggestion}")  # Debug print
         if suggestion and click.confirm(f'Execute this command? {suggestion}'):
             self.execute_system_command(suggestion)
 
@@ -34,7 +36,7 @@ def main():
         cmd = input(">")
         if cmd.lower() == "exit":
             break
-        elif cmd.startswith('#'):
+        elif cmd.strip().startswith('#'):  # Ensure stripping any leading/trailing spaces
             wrapper.handle_lm_command(cmd[1:].strip())  # Remove the '#' and pass the command
         else:
             wrapper.execute_system_command(cmd)

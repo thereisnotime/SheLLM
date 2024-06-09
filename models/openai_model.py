@@ -32,9 +32,13 @@ class OpenAIModel:
                 messages=messages,
                 max_tokens=4000
             )
+            # Print the response for debugging purposes
             print(response)
-            # Extract the response text
-            return response.choices[0].message['content'].strip() if 'choices' in response else None
+            # Properly extract the response text
+            if response.choices:
+                suggested_command = response.choices[0].message.content.strip()  # Access content directly
+                return suggested_command
+            return None
         except Exception as e:
             print(f"Error fetching suggestion from OpenAI: {e}")
             return None
