@@ -43,7 +43,7 @@ Here is a quick demo of SheLLM in action:
 Pre-requisites:
 
 ```bash
-# - Python 3.12 + python3.12-venv (maybe lower versions will work too)
+# - Python 3.12 + python3.12-venv (maybe a lower version will work too)
 # - Groq (https://console.groq.com/keys) or OpenAI (https://platform.openai.com/api-keys) API key
 git clone https://github.com/thereisnotime/SheLLM.git && cd SheLLM
 cp .env.example .env # Update .env with your configuration and API keys.
@@ -93,13 +93,15 @@ Feel free to contribute to the roadmap by creating issues or pull requests with 
 - [x] Add support for ChatGPT.
 - [x] Add Groq support.
 - [ ] Add support for self-hosted LLM models.
+- [ ] Improve prompts for questions, commands and validation.
+- [ ] Add a mechanic that can generate command from the answer to a question.
 - [ ] Improve code structure and quality (e.g. add type hints, docstrings, etc.).
 - [x] Add a proper logging mechanism.
 - [ ] Add context size warnings and automatic context cleanup.
 - [ ] Proper handling of error exits.
 - [ ] Build PyPI package.
 - [ ] Add fancy GitHub Actions CI/CD pipelines with labels and badges.
-- [ ] Improve repository structure.
+- [x] Improve repository structure.
 - [ ] Add env/config validation on load.
 - [ ] Add Jinja2 support for prompt customization.
 - [ ] Add a CONTRIBUTING.md file.
