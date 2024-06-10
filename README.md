@@ -61,8 +61,6 @@ python3 main.py --llm-api=groq
 
 Ask for a command with '#' or ask a question with '##'.
 
-```bash
-
 ## ✨ Features
 
 - ChatGPT/OpenAI support.
