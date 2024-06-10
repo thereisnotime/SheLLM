@@ -125,7 +125,7 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
             logger.debug(f"Response: {response}")
             if response.choices:
                 answer = response.choices[0].message.content.strip()
-                logger.info(f"Answer: {answer}")
+                logger.debug(f"Answer: {answer}")
                 return answer
             logger.warning("No choices in response.")
             return None

@@ -24,35 +24,21 @@ Here is a quick demo of SheLLM in action:
 
 ![Demo01](./assets/demo01.gif)
 
-## Table of Contents
+## 📑 Table of Contents
 
 - [SheLLM](#shellm)
-  - [Table of Contents](#table-of-contents)
-  - [Features](#features)
-  - [Motivation](#motivation)
-  - [Setup and Usage](#setup-and-usage)
-  - [Tests](#tests)
-  - [Known Issues](#known-issues)
-  - [Roadmap](#roadmap)
-  - [Contribution](#contribution)
-  - [License](#license)
-  - [Acknowledgements](#acknowledgements)
+  - [📑 Table of Contents](#-table-of-contents)
+  - [🚀 Quickstart](#-quickstart)
+  - [✨ Features](#-features)
+  - [🎯 Motivation](#-motivation)
+  - [🐞 Known Issues](#-known-issues)
+  - [🛤️ Roadmap](#️-roadmap)
+  - [🧪 Tests](#-tests)
+  - [🤝 Contribution](#-contribution)
+  - [📜 License](#-license)
+  - [🙏 Acknowledgements](#-acknowledgements)
 
-## Features
-
-- ChatGPT/OpenAI support.
-- Groq support.
-- Shell wrapper that can provide suggestions (and execute commands).
-- Knows about previous commands and their output (context awareness).
-- Confirmation before executing commands.
-- Retry mechanism in prompt generation.
-- Supports most of the standard terminal shortcuts.
-
-## Motivation
-
-The motivation behind SheLLM is to provide a more intelligent shell that can help users with suggestions and context-awareness. The idea is to use a language model to understand the context of the commands and provide suggestions based on the context.
-
-## Setup and Usage
+## 🚀 Quickstart
 
 Pre-requisites:
 
@@ -60,9 +46,8 @@ Pre-requisites:
 # - Python 3.12 + python3.12-venv (maybe lower versions will work too)
 # - Groq (https://console.groq.com/keys) or OpenAI (https://platform.openai.com/api-keys) API key
 git clone https://github.com/thereisnotime/SheLLM.git && cd SheLLM
-cp .env.example .env # Update .env with your configuration.
-python3 -m venv venv
-source venv/bin/activate
+cp .env.example .env # Update .env with your configuration and API keys.
+python3 -m venv venv && source venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
@@ -74,20 +59,26 @@ python3 main.py --llm-api=openai
 python3 main.py --llm-api=groq
 ```
 
-## Tests
+Ask for a command with '#' or ask a question with '##'.
 
-Test following cases/scenarios:
+```bash
 
-- [x] Test if it works while in an SSH session and if remote server will save prompt history. - works, prompt not saved.
-- [ ] Test how long history can be used/contextualized.
-- [ ] Test if it works with different shells.
-- [ ] Test if it handles errors.
-- [ ] Test in tmux.
-- [ ] Test in screen.
-- [ ] Test if it will work better outside of venv when multiplexed.
-- [ ] Test context handling.
+## ✨ Features
 
-## Known Issues
+- ChatGPT/OpenAI support.
+- Groq support.
+- Shell wrapper that can provide suggestions (and execute commands).
+- Knows about previous commands and their output (context awareness).
+- Confirmation before executing commands.
+- Retry mechanism in prompt generation.
+- Supports most of the standard terminal shortcuts.
+
+## 🎯 Motivation
+
+The motivation behind SheLLM is to provide a more intelligent shell that can help users with suggestions and context-awareness. The idea is to use a language model to understand the context of the commands and provide suggestions based on the context.
+
+
+## 🐞 Known Issues
 
 The following are the current known issues with SheLLM:
 
@@ -97,7 +88,7 @@ The following are the current known issues with SheLLM:
 - [ ] SheLLM breaks scroll in the terminal after it crashes.
 - [ ] SheLLM's context should take the last output with higher priority and not the previous commands.
 
-## Roadmap
+## 🛤️ Roadmap
 
 Feel free to contribute to the roadmap by creating issues or pull requests with new features or improvements.
 
@@ -129,17 +120,30 @@ Feel free to contribute to the roadmap by creating issues or pull requests with 
 - [x] Add TAB completion for commands.
 - [ ] Add support for PowerShell.
 
-## Contribution
+## 🧪 Tests
 
-Feel free to contribute to SheLLM by creating issues or pull requests. If you have any questions or need help, feel free to ask in the discussions group on Telegram:
+Test following cases/scenarios:
+
+- [x] Test if it works while in an SSH session and if remote server will save prompt history. - works, prompt not saved.
+- [ ] Test how long history can be used/contextualized.
+- [ ] Test if it works with different shells.
+- [ ] Test if it handles errors.
+- [ ] Test in tmux.
+- [ ] Test in screen.
+- [ ] Test if it will work better outside of venv when multiplexed.
+- [ ] Test context handling.
+
+## 🤝 Contribution
+
+Feel free to contribute to SheLLM by creating issues or pull requests. If you are not into coding, you can also support the project by doing tests with various shells, terminals and OS versions (check the Tests section above). If you have any questions or need help, feel free to ask in the discussions group on Telegram:
 
 ![Static Badge](https://img.shields.io/badge/https%3A%2F%2Ft.me%2F%2BIBtlo3xD-cs0NzVk?style=flat&logo=telegram&label=Telegram%20Group&link=https%3A%2F%2Ft.me%2F%2BIBtlo3xD-cs0NzVk)
 
-## License
+## 📜 License
 
 Check the [LICENSE](LICENSE) file for more information.
 
-## Acknowledgements
+## 🙏 Acknowledgements
 
 - [OpenAI](https://openai.com) for providing their Python library and nice API.
 - [Groq](https://groq.com) for providing their Python library and nice API.
