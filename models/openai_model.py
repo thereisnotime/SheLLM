@@ -1,7 +1,7 @@
 import openai
-from dotenv import load_dotenv
 import os
 import logging
+from dotenv import load_dotenv
 from core.logger_setup import setup_logging
 
 # Configure logging

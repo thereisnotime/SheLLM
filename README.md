@@ -17,12 +17,23 @@
 
 # SheLLM
 
-A PoC for a shell wrapper that integrates LLM model(s) for command suggestions and questions with context awareness (not going to take over your computer, I promise).
-It can also execute commands and provide suggestions based on the context.
+A Proof of Concept (PoC) for a **shell wrapper** that integrates LLM models like **ChatGPT/Groq** for **command suggestions** and **context-aware interactions** (don't worry, it won't take over your computer, I promise).
 
-Here is a quick demo of SheLLM in action:
+This shell wrapper can **execute commands** and provide suggestions based on the context, enhancing the overall user experience.
 
-![Demo01](./assets/demo01.gif)
+> It can execute commands:
+
+![Demo01](./assets/demo01.png)
+
+> It can also answer questions:
+
+![Demo02](./assets/demo02.png)
+
+> Here is a quick recording of SheLLM in action:
+
+![Demo01.gif](./assets/demo01.gif)
+
+*Disclaimer: If you are using SheLLM with a third party API, please make sure not share any sensitive information or data with the AI model.*
 
 ## 📑 Table of Contents
 
@@ -59,22 +70,21 @@ python3 main.py --llm-api=openai
 python3 main.py --llm-api=groq
 ```
 
-Ask for a command with '#' or ask a question with '##'.
+Now you can ask for a command with `# find all .py files` or ask a question with `## total size of all found .py files`.
 
 ## ✨ Features
 
-- ChatGPT/OpenAI support.
-- Groq support.
-- Shell wrapper that can provide suggestions (and execute commands).
-- Knows about previous commands and their output (context awareness).
-- Confirmation before executing commands.
-- Retry mechanism in prompt generation.
-- Supports most of the standard terminal shortcuts.
+- **ChatGPT/OpenAI Support**: Integrate with ChatGPT/OpenAI in your terminal.
+- **Groq Support**: Integrate with Groq in your terminal.
+- **Shell Wrapper**: Provides suggestions and can execute commands directly.
+- **Context Awareness**: Remembers previous commands and their outputs.
+- **Command Confirmation**: Prompts for confirmation before executing commands.
+- **Retry Mechanism**: Includes a retry mechanism for prompt re-generation.
+- **Shortcut Support**: Compatible with most standard terminal shortcuts.
 
 ## 🎯 Motivation
 
-The motivation behind SheLLM is to provide a more intelligent shell that can help users with suggestions and context-awareness. The idea is to use a language model to understand the context of the commands and provide suggestions based on the context.
-
+The motivation behind SheLLM is to create a more intelligent shell that assists users with suggestions and context-awareness. By leveraging a language model, SheLLM aims to understand the context of commands and provide relevant suggestions, making the shell experience more efficient and user-friendly.
 
 ## 🐞 Known Issues
 
@@ -102,7 +112,7 @@ Feel free to contribute to the roadmap by creating issues or pull requests with 
 - [ ] Build PyPI package.
 - [ ] Add fancy GitHub Actions CI/CD pipelines with labels and badges.
 - [x] Improve repository structure.
-- [ ] Add env/config validation on load.
+- [ ] Add env/config validation on load (maybe Pydantic).
 - [ ] Add Jinja2 support for prompt customization.
 - [ ] Add a CONTRIBUTING.md file.
 - [ ] Handle proper stream disconnects (SSH/top etc.).
@@ -122,7 +132,7 @@ Feel free to contribute to the roadmap by creating issues or pull requests with 
 
 ## 🧪 Tests
 
-Test following cases/scenarios:
+Test the following cases/scenarios:
 
 - [x] Test if it works while in an SSH session and if remote server will save prompt history. - works, prompt not saved.
 - [ ] Test how long history can be used/contextualized.
@@ -135,7 +145,7 @@ Test following cases/scenarios:
 
 ## 🤝 Contribution
 
-Feel free to contribute to SheLLM by creating issues or pull requests. If you are not into coding, you can also support the project by doing tests with various shells, terminals and OS versions (check the Tests section above). If you have any questions or need help, feel free to ask in the discussions group on Telegram:
+We welcome contributions to SheLLM! You can help by creating issues or submitting pull requests. If coding isn't your thing, you can still support the project by testing it with different shells, terminals, and OS versions (see the Tests section above for details). If you have questions or need assistance, join our discussions group on Telegram:
 
 ![Static Badge](https://img.shields.io/badge/https%3A%2F%2Ft.me%2F%2BIBtlo3xD-cs0NzVk?style=flat&logo=telegram&label=Telegram%20Group&link=https%3A%2F%2Ft.me%2F%2BIBtlo3xD-cs0NzVk)
 
