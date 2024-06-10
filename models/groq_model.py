@@ -72,7 +72,6 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
                 model="mixtral-8x7b-32768",
                 messages=messages
             )
-            print(response)
             if response.choices:
                 suggested_command = response.choices[0].message.content.strip()
                 suggested_command = self.validate_command(suggested_command)

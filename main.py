@@ -30,6 +30,8 @@ def get_prompt():
     user = getpass.getuser()
     host = os.uname().nodename
     path = os.getcwd()
+    if len(path) > 42:
+        path = "../" + os.path.basename(path)
     git_info = get_git_info()
     venv = os.environ.get('VIRTUAL_ENV', '').split('/')[-1] if os.environ.get('VIRTUAL_ENV') else ""
     current_time = datetime.now().strftime('%H:%M:%S')
