@@ -56,6 +56,7 @@ Pre-requisites:
 ```bash
 # - Python 3.12 + python3.12-venv (maybe lower versions will work too)
 # - Groq (https://console.groq.com/keys) or OpenAI (https://platform.openai.com/api-keys) API key
+git clone https://github.com/thereisnotime/SheLLM.git && cd SheLLM
 cp .env.example .env # Update .env with your configuration.
 python3 -m venv venv
 source venv/bin/activate
