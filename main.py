@@ -55,6 +55,10 @@ class SheLLM:
 
     def execute_system_command(self, command):
         """Executes system commands and captures output."""
+        if not command.strip():  # Check if the command is empty or whitespace only
+            print("No command entered. Please enter a valid command.")
+            return  # Exit the function if command is empty
+        
         tokens = shlex.split(command)
         if tokens[0] == 'cd':
             self.change_directory(tokens)
@@ -73,7 +77,7 @@ class SheLLM:
                 if error:
                     print(f"Error: {error}", file=sys.stderr)
             except subprocess.CalledProcessError as e:
-                print(f"An error occurred: {e}", file.sys.stderr)
+                print(f"An error occurred: {e}", file=sys.stderr)
 
     def change_directory(self, tokens):
         """Handles the 'cd' command."""
