@@ -10,6 +10,8 @@ from models.groq_model import GroqModel
 import shlex
 import pty
 import readline
+import select
+import signal
 
 def get_git_info():
     """Returns the current git branch and status if in a git repository."""
@@ -47,6 +49,7 @@ class SheLLM:
     def __init__(self, llm_api):
         self.context = ""
         self.history = []
+        self.current_process_pid = None
         if llm_api == 'groq':
             self.model = GroqModel()
         else:
@@ -67,17 +70,7 @@ class SheLLM:
         elif tokens[0] == 'ssh':
             self.run_interactive_ssh(tokens)
         else:
-            try:
-                result = subprocess.run(command, shell=True, text=True, capture_output=True, check=True)
-                output = result.stdout
-                error = result.stderr
-                self.context += f"\n$ {command}\n{output}{error}"
-                self.history.append(command)
-                print(output)
-                if error:
-                    print(f"Error: {error}", file=sys.stderr)
-            except subprocess.CalledProcessError as e:
-                print(f"An error occurred: {e}", file=sys.stderr)
+            self.run_command_with_pty(command)
 
     def change_directory(self, tokens):
         """Handles the 'cd' command."""
@@ -141,9 +134,44 @@ class SheLLM:
         for i, cmd in enumerate(self.history, 1):
             print(f"{i}: {cmd}")
 
+    def run_command_with_pty(self, command):
+        """Runs commands in a pseudo-terminal to support interactive commands."""
+        def read(fd):
+            while True:
+                r, _, _ = select.select([fd], [], [])
+                if fd in r:
+                    try:
+                        data = os.read(fd, 1024)
+                        if not data:
+                            break
+                        print(data.decode(), end='', flush=True)
+                    except OSError:
+                        break
+
+        pid, fd = pty.fork()
+        if pid == 0:
+            os.execvp("/bin/bash", ["/bin/bash", "-c", command])
+        else:
+            self.current_process_pid = pid
+            try:
+                read(fd)
+            except Exception as e:
+                print(f"An error occurred: {e}", file=sys.stderr)
+            finally:
+                os.close(fd)
+                self.current_process_pid = None
+
+def signal_handler(sig, frame):
+    """Signal handler for SIGINT to stop the current command."""
+    if shellm.current_process_pid:
+        os.kill(shellm.current_process_pid, signal.SIGINT)
+    else:
+        print("\nUse 'exit' to quit SheLLM.")
+
 @click.command()
 @click.option('--llm-api', type=click.Choice(['openai', 'groq']), default='openai', help="Choose the language model API to use.")
 def main(llm_api):
+    global shellm
     init(autoreset=True)
     readline.parse_and_bind('tab: complete')
     readline.parse_and_bind('set editing-mode vi')
@@ -153,19 +181,22 @@ def main(llm_api):
     except FileNotFoundError:
         pass
 
+    shellm = SheLLM(llm_api=llm_api)
+    signal.signal(signal.SIGINT, signal_handler)
+
     click.echo(f"Welcome to the {Fore.RED}SheLLM{Style.RESET_ALL} Model: {Fore.BLUE}{llm_api.capitalize()}{Style.RESET_ALL}. Prefix with '#' to generate a command or '##' to ask a question. Type 'exit' to quit.")
-    wrapper = SheLLM(llm_api=llm_api)
+    
     while True:
         try:
             cmd = input(get_prompt())
             if cmd.lower() == "exit":
                 break
             elif cmd.strip().startswith('##'):
-                wrapper.answer_question(cmd[2:].strip())
+                shellm.answer_question(cmd[2:].strip())
             elif cmd.strip().startswith('#'):
-                wrapper.handle_lm_command(cmd[1:].strip())
+                shellm.handle_lm_command(cmd[1:].strip())
             else:
-                wrapper.execute_system_command(cmd)
+                shellm.execute_system_command(cmd)
         except (EOFError, KeyboardInterrupt):
             print("\nExiting...")
             break

@@ -14,13 +14,7 @@ class GroqModel:
             messages = [
                 {
                     "role": "system",
-                    "content": """You are a senior system administrator responsible for validating shell commands. Your tasks include:
-                    1. Checking for errors in shell commands and fixing them if necessary.
-                    2. Removing any non-command elements (e.g., comments, flags) from the input.
-                    3. Returning the command unchanged if it is already correct.
-                    4. Stripping away any code block formatting.
-                    5. Using simple commands to minimize errors.
-                    6. Anticipating user needs to provide the best possible solution."""
+                    "content": "You are a senior system administrator who must validate shell commands if there are any erros or not and return the proper/fixed version. Also if the input contains anything other than a pure command (e.g. comments, flags, etc.), you must remove them. If the command is already correct, you must return it as is. If the command is in code block, you must remove the code block. Use simple commands and avoid using complex commands for less errors unless required. Anticipate the user's needs and provide the best possible solution."
                 },
                 {
                     "role": "user",
@@ -63,7 +57,7 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
             messages = [
                 {
                     "role": "system",
-                    "content": "You are a helpful assistant that must only output shell commands and nothing else. Anticipate the user's needs and provide the best possible solution. Do not include any comments or flags in the output."
+                    "content": "You serve as a dedicated assistant that exclusively generates shell commands. Given the context provided, proactively discern the user's requirements and provide the most suitable command. Exclude any comments or flags in your output."
                 },
                 {
                     "role": "user",
@@ -75,9 +69,10 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
                 }
             ]
             response = self.client.chat.completions.create(
-                model="llama3-8b-8192",
+                model="mixtral-8x7b-32768",
                 messages=messages
             )
+            print(response)
             if response.choices:
                 suggested_command = response.choices[0].message.content.strip()
                 suggested_command = self.validate_command(suggested_command)
