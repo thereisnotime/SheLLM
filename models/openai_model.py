@@ -1,20 +1,29 @@
 import openai
 from dotenv import load_dotenv
 import os
+import logging
+from utils.logger_setup import setup_logging
+
+# Configure logging
+setup_logging()
+logger = logging.getLogger(__name__)
 
 class OpenAIModel:
     def __init__(self):
+        logger.debug("Initializing OpenAIModel...")
         load_dotenv()
         self.api_key = os.getenv('OPENAI_API_KEY')
         self.client = openai.OpenAI(api_key=self.api_key)
+        logger.debug("OpenAIModel initialized.")
 
     def validate_command(self, command):
         """Validates the command to ensure it is safe and valid to execute."""
+        logger.debug(f"Validating command: {command}")
         try:
             messages = [
                 {
                     "role": "system",
-                    "content": "You are a senior system administrator who must validate shell commands if there are any erros or not and return the proper/fixed version. Also if the input contains anything other than a pure command (e.g. comments, flags, etc.), you must remove them. If the command is already correct, you must return it as is. If the command is in code block, you must remove the code block. Use simple commands and avoid using complex commands for less errors. Anticipate the user's needs and provide the best possible solution."
+                    "content": "You are a senior system administrator who must validate shell commands if there are any errors or not and return the proper/fixed version. Also if the input contains anything other than a pure command (e.g., comments, flags, etc.), you must remove them. If the command is already correct, you must return it as is. If the command is in a code block, you must remove the code block. Use simple commands and avoid using complex commands for fewer errors. Anticipate the user's needs and provide the best possible solution."
                 },
                 {
                     "role": "user",
@@ -44,16 +53,20 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
                 messages=messages,
                 max_tokens=600
             )
+            logger.debug(f"Response: {response}")
             if response.choices:
                 validated_command = response.choices[0].message.content.strip()
+                logger.debug(f"Validated command: {validated_command}")
                 return validated_command
+            logger.warning("No choices in response.")
             return None
         except Exception as e:
-            print(f"Error fetching suggestion from OpenAI: {e}")
+            logger.error(f"Error fetching suggestion from OpenAI: {e}")
             return None
 
     def get_command_suggestion(self, context, prompt):
         """Generates shell commands based on the provided context and prompt."""
+        logger.debug(f"Generating command suggestion for context: {context} and prompt: {prompt}")
         try:
             messages = [
                 {
@@ -74,22 +87,21 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
                 messages=messages,
                 max_tokens=4000
             )
+            logger.debug(f"Response: {response}")
             if response.choices:
                 suggested_command = response.choices[0].message.content.strip()
                 suggested_command = self.validate_command(suggested_command)
-                # NOTE: Disabled in favor of validate_command.
-                # if '```' in suggested_command:
-                #     suggested_command = suggested_command.split('```')[1]
-                #     suggested_command = suggested_command.split('\n', 1)[1]
-                # suggested_command = suggested_command.strip()
+                logger.debug(f"Suggested command: {suggested_command}")
                 return suggested_command
+            logger.warning("No choices in response.")
             return None
         except Exception as e:
-            print(f"Error fetching suggestion from OpenAI: {e}")
+            logger.error(f"Error fetching suggestion from OpenAI: {e}")
             return None
 
     def answer_question(self, context, question):
         """Generates answers to questions based on the provided context and question."""
+        logger.debug(f"Answering question for context: {context} and question: {question}")
         try:
             messages = [
                 {
@@ -110,10 +122,13 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
                 messages=messages,
                 max_tokens=4000
             )
+            logger.debug(f"Response: {response}")
             if response.choices:
                 answer = response.choices[0].message.content.strip()
+                logger.info(f"Answer: {answer}")
                 return answer
+            logger.warning("No choices in response.")
             return None
         except Exception as e:
-            print(f"Error fetching answer from OpenAI: {e}")
+            logger.error(f"Error fetching answer from OpenAI: {e}")
             return None

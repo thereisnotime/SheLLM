@@ -1,20 +1,30 @@
 import os
+import logging
 from groq import Groq
 from dotenv import load_dotenv
+from utils.logger_setup import setup_logging
+
+# Configure logging
+setup_logging()
+logger = logging.getLogger(__name__)
 
 class GroqModel:
     def __init__(self):
+        logger.debug("Initializing GroqModel...")
         load_dotenv()
         self.api_key = os.getenv('GROQ_API_KEY')
+        logger.debug(f"GROQ_API_KEY: {self.api_key}")
         self.client = Groq(api_key=self.api_key)
+        logger.debug("GroqModel initialized.")
 
     def validate_command(self, command):
         """Validates the command to ensure it is safe and valid to execute."""
+        logger.debug(f"Validating command: {command}")
         try:
             messages = [
                 {
                     "role": "system",
-                    "content": "You are a senior system administrator who must validate shell commands if there are any erros or not and return the proper/fixed version. Also if the input contains anything other than a pure command (e.g. comments, flags, etc.), you must remove them. If the command is already correct, you must return it as is. If the command is in code block, you must remove the code block. Use simple commands and avoid using complex commands for less errors unless required. Anticipate the user's needs and provide the best possible solution."
+                    "content": "You are a senior system administrator who must validate shell commands if there are any errors or not and return the proper/fixed version. Also if the input contains anything other than a pure command (e.g., comments, flags, etc.), you must remove them. If the command is already correct, you must return it as is. If the command is in a code block, you must remove the code block. Use simple commands and avoid using complex commands for fewer errors unless required. Anticipate the user's needs and provide the best possible solution."
                 },
                 {
                     "role": "user",
@@ -43,16 +53,20 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
                 model="llama3-8b-8192",
                 messages=messages
             )
+            logger.debug(f"Response: {response}")
             if response.choices:
                 validated_command = response.choices[0].message.content.strip()
+                logger.debug(f"Validated command: {validated_command}")
                 return validated_command
+            logger.warning("No choices in response.")
             return None
         except Exception as e:
-            print(f"Error fetching suggestion from Groq: {e}")
+            logger.error(f"Error fetching suggestion from Groq: {e}")
             return None
 
     def get_command_suggestion(self, context, prompt):
         """Generates shell commands based on the provided context and prompt."""
+        logger.debug(f"Generating command suggestion for context: {context} and prompt: {prompt}")
         try:
             messages = [
                 {
@@ -72,17 +86,21 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
                 model="mixtral-8x7b-32768",
                 messages=messages
             )
+            logger.debug(f"Response: {response}")
             if response.choices:
                 suggested_command = response.choices[0].message.content.strip()
                 suggested_command = self.validate_command(suggested_command)
+                logger.debug(f"Suggested command: {suggested_command}")
                 return suggested_command
+            logger.warning("No choices in response.")
             return None
         except Exception as e:
-            print(f"Error fetching suggestion from Groq: {e}")
+            logger.error(f"Error fetching suggestion from Groq: {e}")
             return None
 
     def answer_question(self, context, question):
         """Generates answers to questions based on the provided context and question."""
+        logger.debug(f"Answering question for context: {context} and question: {question}")
         try:
             messages = [
                 {
@@ -99,13 +117,16 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
                 }
             ]
             response = self.client.chat.completions.create(
-                model="llama3-8b-8192",
+                model="mixtral-8x7b-32768",
                 messages=messages
             )
+            logger.debug(f"Response: {response}")
             if response.choices:
                 answer = response.choices[0].message.content.strip()
+                logger.debug(f"Answer: {answer}")
                 return answer
+            logger.warning("No choices in response.")
             return None
         except Exception as e:
-            print(f"Error fetching answer from Groq: {e}")
+            logger.error(f"Error fetching answer from Groq: {e}")
             return None

@@ -3,15 +3,21 @@ import subprocess
 import sys
 import os
 import getpass
-from datetime import datetime
-from colorama import Fore, Style, init
-from models.openai_model import OpenAIModel
-from models.groq_model import GroqModel
+import logging
 import shlex
 import pty
 import readline
 import select
 import signal
+from utils.logger_setup import setup_logging
+from datetime import datetime
+from colorama import Fore, Style, init
+from models.openai_model import OpenAIModel
+from models.groq_model import GroqModel
+
+# Configure logging
+setup_logging()
+logger = logging.getLogger(__name__)
 
 def get_git_info():
     """Returns the current git branch and status if in a git repository."""
@@ -57,11 +63,12 @@ class SheLLM:
         else:
             self.model = OpenAIModel()
         self.ssh_session = None
+        logger.info(f"SheLLM initialized with {llm_api} model.")
 
     def execute_system_command(self, command):
         """Executes system commands and captures output."""
         if not command.strip():
-            print("No command entered. Please enter a valid command.")
+            logger.info("No command entered. Please enter a valid command.")
             return
         
         tokens = shlex.split(command)
@@ -82,7 +89,7 @@ class SheLLM:
             else:
                 os.chdir(os.path.expanduser('~'))
         except FileNotFoundError as e:
-            print(f"cd: {e}", file=sys.stderr)
+            logger.error(f"cd: {e}")
 
     def run_interactive_ssh(self, tokens):
         """Runs an interactive SSH session."""
@@ -94,7 +101,7 @@ class SheLLM:
                 self.ssh_session = fd
                 self.interactive_ssh()
         except Exception as e:
-            print(f"SSH session error: {e}", file=sys.stderr)
+            logger.error(f"SSH session error: {e}")
 
     def interactive_ssh(self):
         """Handles interactive SSH session."""
@@ -102,7 +109,8 @@ class SheLLM:
             try:
                 data = os.read(self.ssh_session, 1024).decode()
                 if data:
-                    print(data, end='', flush=True)
+                    sys.stdout.write(data)
+                    sys.stdout.flush()
                 command = input(get_prompt())
                 if command.strip().startswith('##'):
                     self.answer_question(command[2:].strip())
@@ -117,7 +125,7 @@ class SheLLM:
         suggestion = self.model.get_command_suggestion(self.context, command)
         if suggestion:
             current_time = datetime.now().strftime('%H:%M:%S')
-            print(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Execute command: {Fore.RED}{suggestion}{Style.RESET_ALL}")
+            logger.info(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Execute command: {Fore.RED}{suggestion}{Style.RESET_ALL}")
             if click.confirm(''):
                 if remote and self.ssh_session:
                     os.write(self.ssh_session, (suggestion + '\n').encode())
@@ -127,14 +135,17 @@ class SheLLM:
     def answer_question(self, question):
         answer = self.model.answer_question(self.context, question)
         current_time = datetime.now().strftime('%H:%M:%S')
-        print(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Answer: {Fore.GREEN}{answer}{Style.RESET_ALL}")
+        logger.info(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Answer: {Fore.GREEN}{answer}{Style.RESET_ALL}")
         return answer
 
     def show_history(self):
         current_time = datetime.now().strftime('%H:%M:%S')
-        print(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Command History:")
-        for i, cmd in enumerate(self.history, 1):
-            print(f"{i}: {cmd}")
+        if not self.history:
+            logger.info(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} No command history.")
+        else:
+            logger.info(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Command History:")
+            for i, cmd in enumerate(self.history, 1):
+                logger.info(f"{i}: {cmd}")
 
     def run_command_with_pty(self, command):
         """Runs commands in a pseudo-terminal to support interactive commands."""
@@ -146,7 +157,8 @@ class SheLLM:
                         data = os.read(fd, 1024)
                         if not data:
                             break
-                        print(data.decode(), end='', flush=True)
+                        sys.stdout.write(data.decode())
+                        sys.stdout.flush()
                     except OSError:
                         break
 
@@ -158,7 +170,7 @@ class SheLLM:
             try:
                 read(fd)
             except Exception as e:
-                print(f"An error occurred: {e}", file=sys.stderr)
+                logger.error(f"An error occurred: {e}")
             finally:
                 os.close(fd)
                 self.current_process_pid = None
@@ -168,7 +180,7 @@ def signal_handler(sig, frame):
     if shellm.current_process_pid:
         os.kill(shellm.current_process_pid, signal.SIGINT)
     else:
-        print("\nUse 'exit' to quit SheLLM.")
+        logger.info("\nUse 'exit' to quit SheLLM.")
 
 @click.command()
 @click.option('--llm-api', type=click.Choice(['openai', 'groq']), default='openai', help="Choose the language model API to use.")
@@ -186,7 +198,7 @@ def main(llm_api):
     shellm = SheLLM(llm_api=llm_api)
     signal.signal(signal.SIGINT, signal_handler)
 
-    click.echo(f"Welcome to the {Fore.RED}SheLLM{Style.RESET_ALL} Model: {Fore.BLUE}{llm_api.capitalize()}{Style.RESET_ALL}. Prefix with '#' to generate a command or '##' to ask a question. Type 'exit' to quit.")
+    logger.info(f"Welcome to the {Fore.RED}SheLLM{Style.RESET_ALL} Model: {Fore.BLUE}{llm_api.capitalize()}{Style.RESET_ALL}. Prefix with '#' to generate a command or '##' to ask a question. Type 'exit' to quit.")
     
     while True:
         try:
@@ -200,7 +212,7 @@ def main(llm_api):
             else:
                 shellm.execute_system_command(cmd)
         except (EOFError, KeyboardInterrupt):
-            print("\nExiting...")
+            logger.info("\nExiting...")
             break
 
     readline.write_history_file(history_file)
