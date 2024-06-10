@@ -82,6 +82,7 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
                     "content": prompt
                 }
             ]
+            logger.debug(f"Messages sent to API: {messages}")
             response = self.client.chat.completions.create(
                 model="gpt-4o",
                 messages=messages,
@@ -90,8 +91,9 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
             logger.debug(f"Response: {response}")
             if response.choices:
                 suggested_command = response.choices[0].message.content.strip()
+                logger.debug(f"Suggested command before validation: {suggested_command}")
                 suggested_command = self.validate_command(suggested_command)
-                logger.debug(f"Suggested command: {suggested_command}")
+                logger.debug(f"Suggested command after validation: {suggested_command}")
                 return suggested_command
             logger.warning("No choices in response.")
             return None
@@ -117,6 +119,7 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
                     "content": question
                 }
             ]
+            logger.debug(f"Messages sent to API: {messages}")
             response = self.client.chat.completions.create(
                 model="gpt-4o",
                 messages=messages,

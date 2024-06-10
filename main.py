@@ -65,6 +65,11 @@ class SheLLM:
         self.ssh_session = None
         logger.info(f"SheLLM initialized with {llm_api} model.")
 
+    def update_context(self, output):
+        """Updates the context with new terminal output."""
+        self.context += output + "\n"
+        logger.debug(f"Updated context: {self.context}")
+
     def execute_system_command(self, command):
         """Executes system commands and captures output."""
         if not command.strip():
@@ -88,8 +93,42 @@ class SheLLM:
                 os.chdir(tokens[1])
             else:
                 os.chdir(os.path.expanduser('~'))
+            self.update_context(f"Changed directory to {os.getcwd()}")
         except FileNotFoundError as e:
             logger.error(f"cd: {e}")
+
+    def run_command_with_pty(self, command):
+        """Runs commands in a pseudo-terminal to support interactive commands."""
+        def read(fd):
+            output = ""
+            while True:
+                r, _, _ = select.select([fd], [], [])
+                if fd in r:
+                    try:
+                        data = os.read(fd, 1024)
+                        if not data:
+                            break
+                        decoded_data = data.decode()
+                        sys.stdout.write(decoded_data)
+                        sys.stdout.flush()
+                        output += decoded_data
+                    except OSError:
+                        break
+            return output
+
+        pid, fd = pty.fork()
+        if pid == 0:
+            os.execvp("/bin/bash", ["/bin/bash", "-c", command])
+        else:
+            self.current_process_pid = pid
+            try:
+                output = read(fd)
+                self.update_context(output)
+            except Exception as e:
+                logger.error(f"An error occurred: {e}")
+            finally:
+                os.close(fd)
+                self.current_process_pid = None
 
     def run_interactive_ssh(self, tokens):
         """Runs an interactive SSH session."""
@@ -153,34 +192,6 @@ class SheLLM:
             logger.info(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Command History:")
             for i, cmd in enumerate(self.history, 1):
                 logger.info(f"{i}: {cmd}")
-
-    def run_command_with_pty(self, command):
-        """Runs commands in a pseudo-terminal to support interactive commands."""
-        def read(fd):
-            while True:
-                r, _, _ = select.select([fd], [], [])
-                if fd in r:
-                    try:
-                        data = os.read(fd, 1024)
-                        if not data:
-                            break
-                        sys.stdout.write(data.decode())
-                        sys.stdout.flush()
-                    except OSError:
-                        break
-
-        pid, fd = pty.fork()
-        if pid == 0:
-            os.execvp("/bin/bash", ["/bin/bash", "-c", command])
-        else:
-            self.current_process_pid = pid
-            try:
-                read(fd)
-            except Exception as e:
-                logger.error(f"An error occurred: {e}")
-            finally:
-                os.close(fd)
-                self.current_process_pid = None
 
 def signal_handler(sig, frame):
     """Signal handler for SIGINT to stop the current command."""
