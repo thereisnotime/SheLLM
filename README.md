@@ -45,6 +45,7 @@ Here is a quick demo of SheLLM in action:
 - Confirmation before executing commands.
 - ChatGPT integration.
 - Groq integration.
+- Supports most of the standard terminal shortcuts.
 
 ## Motivation
 
@@ -89,13 +90,10 @@ Test following cases/scenarios:
 
 The following are the current known issues with SheLLM:
 
-- [ ] SheLLM does not like an empty command.
 - [ ] SheLLM does not handle SSH stream properly (could be better).
 - [ ] SheLLM does not handle error exits properly.
 - [ ] SheLLM does not handle streaming output properly.
-- [ ] SheLLM does not handle TAB completion for commands.
 - [ ] SheLLM breaks scroll in the terminal after it crashes.
-- [ ] SheLLM does not handle ALT/CTRL cursor movement shortcuts.
 - [ ] SheLLM's context should take the last output with higher priority and not the previous commands.
 
 ## Roadmap
@@ -114,7 +112,7 @@ Feel free to contribute to the roadmap by creating issues or pull requests with 
 - [ ] Improve repository structure.
 - [ ] Add env/config validation on load.
 - [ ] Add Jinja2 support for prompt customization.
-- [ ] Add a CONTRIVIBUTING.md file.
+- [ ] Add a CONTRIBUTING.md file.
 - [ ] Handle proper stream disconnects (SSH/top etc.).
 - [ ] Add optional secret check for requests sanitization.
 - [ ] Add optional PII check for requests sanitization.
@@ -127,7 +125,7 @@ Feel free to contribute to the roadmap by creating issues or pull requests with 
 - [ ] Add local logging for full terminal context for future embeddings optimization.
 - [ ] Do not approve PRs from John Connor 🤖.
 - [ ] Add mechanism to handle streaming output (e.g. tail -f, top, etc.).
-- [ ] Add TAB completion for commands.
+- [x] Add TAB completion for commands.
 - [ ] Add support for PowerShell.
 
 ## Contribution

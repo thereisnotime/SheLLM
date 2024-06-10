@@ -9,11 +9,11 @@ from models.openai_model import OpenAIModel
 from models.groq_model import GroqModel
 import shlex
 import pty
+import readline
 
 def get_git_info():
     """Returns the current git branch and status if in a git repository."""
     try:
-        # Check if the current directory is a git repository
         if subprocess.run(['git', 'rev-parse', '--is-inside-work-tree'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True).returncode == 0:
             branch = subprocess.check_output(['git', 'branch', '--show-current'], text=True).strip()
             status = subprocess.check_output(['git', 'status', '--porcelain'], text=True)
@@ -55,9 +55,9 @@ class SheLLM:
 
     def execute_system_command(self, command):
         """Executes system commands and captures output."""
-        if not command.strip():  # Check if the command is empty or whitespace only
+        if not command.strip():
             print("No command entered. Please enter a valid command.")
-            return  # Exit the function if command is empty
+            return
         
         tokens = shlex.split(command)
         if tokens[0] == 'cd':
@@ -135,7 +135,6 @@ class SheLLM:
         print(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Answer: {Fore.GREEN}{answer}{Style.RESET_ALL}")
         return answer
 
-    # TODO: Hook this with the shell history and implement SheLLM custom history with session support.
     def show_history(self):
         current_time = datetime.now().strftime('%H:%M:%S')
         print(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Command History:")
@@ -146,18 +145,32 @@ class SheLLM:
 @click.option('--llm-api', type=click.Choice(['openai', 'groq']), default='openai', help="Choose the language model API to use.")
 def main(llm_api):
     init(autoreset=True)
+    readline.parse_and_bind('tab: complete')
+    readline.parse_and_bind('set editing-mode vi')
+    history_file = os.path.expanduser("~/.shellm_history")
+    try:
+        readline.read_history_file(history_file)
+    except FileNotFoundError:
+        pass
+
     click.echo(f"Welcome to the {Fore.RED}SheLLM{Style.RESET_ALL} Model: {Fore.BLUE}{llm_api.capitalize()}{Style.RESET_ALL}. Prefix with '#' to generate a command or '##' to ask a question. Type 'exit' to quit.")
     wrapper = SheLLM(llm_api=llm_api)
     while True:
-        cmd = input(get_prompt())
-        if cmd.lower() == "exit":
+        try:
+            cmd = input(get_prompt())
+            if cmd.lower() == "exit":
+                break
+            elif cmd.strip().startswith('##'):
+                wrapper.answer_question(cmd[2:].strip())
+            elif cmd.strip().startswith('#'):
+                wrapper.handle_lm_command(cmd[1:].strip())
+            else:
+                wrapper.execute_system_command(cmd)
+        except (EOFError, KeyboardInterrupt):
+            print("\nExiting...")
             break
-        elif cmd.strip().startswith('##'):
-            wrapper.answer_question(cmd[2:].strip())
-        elif cmd.strip().startswith('#'):
-            wrapper.handle_lm_command(cmd[1:].strip())
-        else:
-            wrapper.execute_system_command(cmd)
+
+    readline.write_history_file(history_file)
 
 if __name__ == "__main__":
     main()
