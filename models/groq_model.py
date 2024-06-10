@@ -2,7 +2,7 @@ import os
 import logging
 from groq import Groq
 from dotenv import load_dotenv
-from core.logger_setup import setup_logging
+from config.logger_setup import setup_logging
 
 # Configure logging
 setup_logging()

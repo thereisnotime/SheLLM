@@ -4,7 +4,7 @@ import signal
 import readline
 import logging
 from colorama import init, Fore, Style
-from core.logger_setup import setup_logging
+from config.logger_setup import setup_logging
 from core.shellm import SheLLM
 from core.prompt import get_prompt
 

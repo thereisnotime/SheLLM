@@ -39,7 +39,7 @@ class SheLLM:
         elif tokens[0] == 'history':
             self.show_history()
         elif tokens[0] == 'ssh':
-            run_interactive_ssh(tokens)
+            run_interactive_ssh(tokens, self)
         else:
             output = run_command_with_pty(command)
             self.update_context(output)
