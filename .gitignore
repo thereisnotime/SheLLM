@@ -1,3 +1,6 @@
+# Assets
+*.cast
+
 # Secret
 .env
 

@@ -4,7 +4,7 @@
 
 ![GitHub License](https://img.shields.io/github/license/thereisnotime/SheLLM) ![Static Badge](https://img.shields.io/badge/https%3A%2F%2Ft.me%2F%2BIBtlo3xD-cs0NzVk?style=flat&logo=telegram&label=Telegram%20Group&link=https%3A%2F%2Ft.me%2F%2BIBtlo3xD-cs0NzVk) ![GitHub commit activity](https://img.shields.io/github/commit-activity/t/thereisnotime/SheLLM) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
 
-<h3 align="center">🤖 Powered by [INSERT LLM HERE]) 🤖</h3>
+<h3 align="center">🤖 Powered by [INSERT LLM HERE] 🤖</h3>
 
 <h3>NOTE: This is a PoC in very, very early stage of development (but it works). Help is most welcome!<h3>
 
@@ -18,6 +18,10 @@
 
 A PoC for a shell wrapper that integrates LLM model(s) for command suggestions and questions with context awareness (not going to take over your computer, I promise).
 It can also execute commands and provide suggestions based on the context.
+
+Here is a quick demo of SheLLM in action:
+
+![Demo01](./assets/demo01.gif)
 
 ## Table of Contents
 
@@ -51,7 +55,7 @@ Pre-requisites:
 
 ```bash
 # - Python 3.12 + python3.12-venv (maybe lower versions will work too)
-# - Groq or OpenAI API key
+# - Groq (https://console.groq.com/keys) or OpenAI (https://platform.openai.com/api-keys) API key
 cp .env.example .env # Update .env with your configuration.
 python3 -m venv venv
 source venv/bin/activate
@@ -108,6 +112,7 @@ Feel free to contribute to the roadmap by creating issues or pull requests with 
 - [ ] Improve repository structure.
 - [ ] Add env/config validation on load.
 - [ ] Add Jinja2 support for prompt customization.
+- [ ] Add a CONTRIVIBUTING.md file.
 - [ ] Handle proper stream disconnects (SSH/top etc.).
 - [ ] Add a mechanism to detect errors after commands execution and ask to solve them.
 - [ ] Add configuration support (LLM type, LLM model config per command type, token, history size, trigger chars, execute command without confirmation).
