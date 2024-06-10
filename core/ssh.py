@@ -1,5 +1,6 @@
 import os
 import pty
+import sys
 import select
 import logging
 from .prompt import get_prompt
