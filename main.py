@@ -122,15 +122,22 @@ class SheLLM:
                 break
 
     def handle_lm_command(self, command, remote=False):
-        suggestion = self.model.get_command_suggestion(self.context, command)
-        if suggestion:
-            current_time = datetime.now().strftime('%H:%M:%S')
-            logger.info(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} {Fore.BLUE}[{current_time}]{Style.RESET_ALL} Execute command: {Fore.RED}{suggestion}{Style.RESET_ALL}")
-            if click.confirm(''):
-                if remote and self.ssh_session:
-                    os.write(self.ssh_session, (suggestion + '\n').encode())
-                else:
-                    self.execute_system_command(suggestion)
+        while True:
+            suggestion = self.model.get_command_suggestion(self.context, command)
+            if suggestion:
+                current_time = datetime.now().strftime('%H:%M:%S')
+                logger.info(f"Execute command: {Fore.RED}{suggestion}{Style.RESET_ALL}")
+                response = click.prompt(f"{Fore.RED}[SheLLM]{Style.RESET_ALL} Confirm execution (Y/n/r)", type=str, default='Y').lower()
+                if response == 'y':
+                    if remote and self.ssh_session:
+                        os.write(self.ssh_session, (suggestion + '\n').encode())
+                    else:
+                        self.execute_system_command(suggestion)
+                    break
+                elif response == 'n':
+                    break
+                elif response == 'r':
+                    continue
 
     def answer_question(self, question):
         answer = self.model.answer_question(self.context, question)

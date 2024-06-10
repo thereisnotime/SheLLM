@@ -40,11 +40,12 @@ Here is a quick demo of SheLLM in action:
 
 ## Features
 
+- ChatGPT/OpenAI support.
+- Groq support.
 - Shell wrapper that can provide suggestions (and execute commands).
 - Knows about previous commands and their output (context awareness).
 - Confirmation before executing commands.
-- ChatGPT integration.
-- Groq integration.
+- Retry mechanism in prompt generation.
 - Supports most of the standard terminal shortcuts.
 
 ## Motivation
@@ -92,7 +93,7 @@ The following are the current known issues with SheLLM:
 
 - [ ] SheLLM does not handle SSH stream properly (could be better).
 - [ ] SheLLM does not handle error exits properly.
-- [ ] SheLLM does not handle streaming output properly.
+- [ ] SheLLM get stuck in prompt generation while CTRL+C is pressed.
 - [ ] SheLLM breaks scroll in the terminal after it crashes.
 - [ ] SheLLM's context should take the last output with higher priority and not the previous commands.
 
@@ -104,7 +105,7 @@ Feel free to contribute to the roadmap by creating issues or pull requests with 
 - [x] Add Groq support.
 - [ ] Add support for self-hosted LLM models.
 - [ ] Improve code structure and quality (e.g. add type hints, docstrings, etc.).
-- [ ] Add a proper logging mechanism.
+- [x] Add a proper logging mechanism.
 - [ ] Add context size warnings and automatic context cleanup.
 - [ ] Proper handling of error exits.
 - [ ] Build PyPI package.
@@ -124,7 +125,7 @@ Feel free to contribute to the roadmap by creating issues or pull requests with 
 - [ ] Add detailed SheLLM history (with timestamps) for each session.
 - [ ] Add local logging for full terminal context for future embeddings optimization.
 - [ ] Do not approve PRs from John Connor 🤖.
-- [ ] Add mechanism to handle streaming output (e.g. tail -f, top, etc.).
+- [x] Add mechanism to handle streaming output (e.g. tail -f, top, etc.).
 - [x] Add TAB completion for commands.
 - [ ] Add support for PowerShell.
 
