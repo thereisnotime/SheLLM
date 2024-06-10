@@ -3,6 +3,7 @@ import logging
 from groq import Groq
 from dotenv import load_dotenv
 from config.logger_setup import setup_logging
+from utils.sanitizer import remove_code_block
 
 # Configure logging
 setup_logging()
@@ -56,8 +57,9 @@ docker system df | awk '/VOLUME/{getline; while($1 ~ /^[[:alnum:]]/){print $2, $
             logger.debug(f"Response: {response}")
             if response.choices:
                 validated_command = response.choices[0].message.content.strip()
-                logger.debug(f"Validated command: {validated_command}")
-                return validated_command
+                output = remove_code_block(validated_command)
+                logger.debug(f"Validated command: {output}")
+                return output
             logger.warning("No choices in response.")
             return None
         except Exception as e:

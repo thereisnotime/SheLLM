@@ -92,6 +92,7 @@ The following are the current known issues with SheLLM:
 
 - [ ] SheLLM does not handle SSH stream properly (could be better).
 - [ ] SheLLM does not handle error exits properly.
+- [ ] SheLLM breaks the standard terminal shortcuts when in an SSH session.
 - [ ] SheLLM get stuck in prompt generation while CTRL+C is pressed.
 - [ ] SheLLM breaks scroll in the terminal after it crashes.
 - [ ] SheLLM's context should take the last output with higher priority and not the previous commands.
@@ -113,9 +114,10 @@ Feel free to contribute to the roadmap by creating issues or pull requests with 
 - [ ] Add fancy GitHub Actions CI/CD pipelines with labels and badges.
 - [x] Improve repository structure.
 - [ ] Add env/config validation on load (maybe Pydantic).
+- [ ] Create tests setup for the main features.
 - [ ] Add Jinja2 support for prompt customization.
 - [ ] Add a CONTRIBUTING.md file.
-- [ ] Handle proper stream disconnects (SSH/top etc.).
+- [ ] Handle proper stream disconnects (SSH/top etc.) and improve SSH experience overall.
 - [ ] Add optional secret check for requests sanitization.
 - [ ] Add optional PII check for requests sanitization.
 - [ ] Add a mechanism to detect errors after commands execution and ask to solve them.
