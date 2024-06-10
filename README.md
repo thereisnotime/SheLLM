@@ -2,7 +2,8 @@
 <h3 align="center">Let the AI  in your terminal </h3>
 <hr>
 
-![GitHub License](https://img.shields.io/github/license/thereisnotime/SheLLM) ![Static Badge](https://img.shields.io/badge/https%3A%2F%2Ft.me%2F%2BIBtlo3xD-cs0NzVk?style=flat&logo=telegram&label=Telegram%20Group&link=https%3A%2F%2Ft.me%2F%2BIBtlo3xD-cs0NzVk) ![GitHub commit activity](https://img.shields.io/github/commit-activity/t/thereisnotime/SheLLM) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
+![GitHub License](https://img.shields.io/github/license/thereisnotime/SheLLM) ![Static Badge](https://img.shields.io/badge/https%3A%2F%2Ft.me%2F%2BIBtlo3xD-cs0NzVk?logo=telegram&label=Telegram%20Group)
+ ![GitHub commit activity](https://img.shields.io/github/commit-activity/t/thereisnotime/SheLLM) [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
 
 <h3 align="center">🤖 Powered by [INSERT LLM HERE] 🤖</h3>
 
@@ -115,6 +116,8 @@ Feel free to contribute to the roadmap by creating issues or pull requests with 
 - [ ] Add Jinja2 support for prompt customization.
 - [ ] Add a CONTRIVIBUTING.md file.
 - [ ] Handle proper stream disconnects (SSH/top etc.).
+- [ ] Add optional secret check for requests sanitization.
+- [ ] Add optional PII check for requests sanitization.
 - [ ] Add a mechanism to detect errors after commands execution and ask to solve them.
 - [ ] Add configuration support (LLM type, LLM model config per command type, token, history size, trigger chars, execute command without confirmation).
 - [ ] Add wrapper for screen (auto start and stop).
